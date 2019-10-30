@@ -14,19 +14,20 @@
     <div id="root"></div>
     <script type="text/babel" src="script.js"></script>
     <script type="text/javascript">
-      let request = new XMLHttpRequest();
+      var request = new XMLHttpRequest();
       //request.open('GET', 'api.openweathermap.org/data/2.5/weather?id=2172797&APPID=1691f032793d309e08203112cd0cd698', true);
 
       request.open('GET', 'https://ghibliapi.herokuapp.com/films',true);
-      request.onload = function() {};
-      
-      request.send();
-      
+      request.onload = function() {
       var data = JSON.parse(this.response);
       //      console.log(data.main.temp);
       data.forEach(movie => {
       console.log(movie.title)
       });
+      }
+      
+
+      request.send();
     </script>
   </body>
 </html>
