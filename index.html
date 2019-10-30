@@ -13,19 +13,24 @@
   <body>
     <div id="root"></div>
     <script type="text/babel" src="script.js"></script>
-    <script type="text/javascript">
+    <script type="text/babel">
       var request = new XMLHttpRequest();
-      //request.open('GET', 'api.openweathermap.org/data/2.5/weather?id=2172797&APPID=1691f032793d309e08203112cd0cd698', true);
+request.open('GET', 'http://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=1691f032793d309e08203112cd0cd698', true);
 
-      request.open('GET', 'https://ghibliapi.herokuapp.com/films',true);
-      request.onload = function() {
-      var data = JSON.parse(this.response);
-      //      console.log(data.main.temp);
-      data.forEach(movie => {
-      console.log(movie.title)
-      });
-      }
-      
+//request.open('GET', 'https://ghibliapi.herokuapp.com/films',true);
+request.addEventListener("load", output);
+
+function output() {
+    //var data = JSON.parse(this.response);
+      console.log("It worked!");
+      ReactDOM.render(
+      <div>
+	<h1>It worked!</h1>
+	<p>{this.response}</p>
+      </div>,
+	document.getElementById('root')
+	);
+};
 
       request.send();
     </script>
