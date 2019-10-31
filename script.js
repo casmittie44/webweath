@@ -1,103 +1,136 @@
 /*
-// Clock example
-class Clock extends React.Component {
+function App() {
+    return(
+	    <div>
+	    <Heading />
+	    <CityForm />
+	    <Weather city='Sydney' country='aus' />
+	    </div>
+    );
+}
+*/
+
+class App extends React.Component {
     constructor(props) {
 	super(props);
-	this.state = {date: new Date()};
+	this.state = {city: '', country: ''};
+	this.handleInput = this.handleInput.bind(this);
     }
-    
-    componentDidMount() {
-	this.timerID = setInterval(
-	    ()=>this.tick(),
-	    1000
-	);
-    }
-    
-    componentWillUnmount() {
-	clearInterval(this.timerID);
-    }
-    
-    tick() {
-	this.setState( {
-	    date: new Date()
-	});
+
+    handleInput = (cityValue, countryValue) => {
+	console.log("In App.handleInput...");
+	console.log(cityValue);
+	console.log(countryValue);
+	this.setState(state => ({city: cityValue, country: countryValue}));
     }
     
     render() {
+	console.log('city: ' + this.state.city);
+	console.log('country:' + this.state.country);
 	return(
 		<div>
-		<h1>Hello, World!</h1>
-		<h2>It is {this.state.date.toLocaleTimeString()}.</h2>
+		<Heading />	
+		<LocationForm callback={this.handleInput}/>
+		<Weather city={this.state.city} country={this.state.country} />
+		</div>
+	);	
+
+    }
+}
+    
+function Heading() {
+    return(
+	<div className='heading'>
+	    <h1>Weather</h1>
+	    <h3>Enter a city and country.</h3>
+	    </div>
+    );
+}
+
+class LocationForm extends React.Component {
+    constructor(props) {
+	super(props);
+	this.callback = props.callback;
+	this.state = {city: '', country: ''};
+	this.handleChange = this.handleChange.bind(this);
+	this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleChange(event) {
+	const target = event.target;
+	const name = target.name;
+	this.setState({
+	    [name]: target.value
+	});
+    }
+
+    handleSubmit(event) {
+	console.log("In handleSubmit...");
+	console.log(this.state.city);
+	console.log(this.state.country);
+	this.callback(this.state.city, this.state.country);
+	event.preventDefault();
+    }
+
+    render() {
+	return(
+	    <div className='container'>
+		<form onSubmit={this.handleSubmit}>
+		<label>
+		City:
+		<input
+	    name='city'
+	    type="text"
+	    value={this.state.city}
+	    onChange={this.handleChange} />
+		</label>
+		<br />
+		<label>
+		Country:
+		<input
+	    name='country'
+	    type="text"
+	    value={this.state.country}
+	    onChange={this.handleChange}
+		/>
+		</label>
+		<input type="submit" value="Submit" />
+		</form>
 		</div>
 	);
     }
 }
 
-function App() {
-    return(
-	    <div>
-	    <Clock />
-	    <Clock />
-	    <Clock />
-	    </div>
-    );
-}
-
-/* Inline script version    
-var request = new XMLHttpRequest();
-request.open('GET', 'http://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=1691f032793d309e08203112cd0cd698', true);
-
-//request.open('GET', 'https://ghibliapi.herokuapp.com/films',true);
-request.addEventListener("load", output);
-
-function output() {
-      var data = JSON.parse(this.response);
-      console.log("It worked!");
-      ReactDOM.render(
-      <div>
-	<h1>It worked!</h1>
-	<p>{data['main']['temp']}</p>
-      </div>,
-	document.getElementById('root')
-	);
-};
-*/
-
-function App() {
-    return(
-	    <div>
-	    <Weather />
-	    </div>
-    );
-}
-
 class Weather extends React.Component {
     constructor(props) {
 	super(props);
-	this.state = {dataReceived: false, temp: 0};
-	this.city = 'Melbourne';
-	this.country = 'aus';
-	this.getWeather(this.city, this.country);
-	//this.processResponse = this.processResponse.bind(this);
+	this.state = {dataReceived: false};
+	this.temp = 0;
     }
 
     getWeather(city, country) {
-	var request = new XMLHttpRequest();
-	request.open('GET', 'http://api.openweathermap.org/data/2.5/weather?q='
-		     + this.city + ',' + this.country + '&APPID=1691f032793d309e08203112cd0cd698', true);
-	request.onload = () =>
-	{
-	  //  console.log(request.response);
-	    var data = JSON.parse(request.response);
-	    var temperature =  this.kelvinToCelsius(data['main']['temp']);
-	    this.setState({dataReceived: true,
-			   temp: temperature}
-			 );
-
-	    // console.log(this.state.temp);
+	// Check if the city and country are null
+	if(city === '' || country === '') {
+	    return;
 	}
 	
-	request.send();
+	else {
+	    var request = new XMLHttpRequest();
+	    request.open('GET', 'http://api.openweathermap.org/data/2.5/weather?q='
+			 + city + ',' + country + '&APPID=1691f032793d309e08203112cd0cd698', true);
+	    request.onload = () =>
+		{
+		    console.log("Request sent...");
+		    //  console.log(request.response);
+		    var data = JSON.parse(request.response);
+		    var temperature =  this.kelvinToCelsius(data['main']['temp']);
+		    this.setState({dataReceived: true});
+		    this.temp = temperature;
+		    // console.log(this.state.temp);
+		}
+	    
+	    request.send();
+	}
     }
 
     kelvinToCelsius(kelvins) {
@@ -105,11 +138,20 @@ class Weather extends React.Component {
     }
     
     render() {
-	if(this.state.dataReceived) {
+	const city = this.props.city;
+	const country = this.props.country;
+	this.getWeather(city, country);
+	console.log("In Weather.render...");
+	console.log("city: " + city);
+	console.log("country: " + country);
+	if(city === '' || country === ''){
+	    return null;
+	}
+	
+	else if(this.state.dataReceived) {
 	return (
 		<div>
-		<h1>It worked!</h1>
-		<p>Temperature is {this.state.temp}.</p>
+		<p>Temperature is {Math.round(this.temp)}.</p>
 		</div>
 	);
 	}
@@ -117,7 +159,6 @@ class Weather extends React.Component {
 	else {
 	    return (
 		    <div>
-		    <h1>It worked!</h1>
 		    <p>Temperature is loading...</p>
 		    </div>
 	    );
