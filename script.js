@@ -1,36 +1,21 @@
-/*
-function App() {
-    return(
-	    <div>
-	    <Heading />
-	    <CityForm />
-	    <Weather city='Sydney' country='aus' />
-	    </div>
-    );
-}
-*/
-
 class App extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {city: '', country: ''};
-	this.handleInput = this.handleInput.bind(this);
+	this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleInput = (cityValue, countryValue) => {
-	console.log("In App.handleInput...");
-	console.log(cityValue);
-	console.log(countryValue);
-	this.setState(state => ({city: cityValue, country: countryValue}));
+    handleSubmit = (cityValue, countryValue) => {
+	if(this.state.city != cityValue || this.state.country != countryValue) {
+	    this.setState(state => ({city: cityValue, country: countryValue}));
+	}
     }
     
     render() {
-	console.log('city: ' + this.state.city);
-	console.log('country:' + this.state.country);
 	return(
 		<div>
 		<Heading />	
-		<LocationForm callback={this.handleInput}/>
+		<LocationForm callback={this.handleSubmit}/>
 		<Weather city={this.state.city} country={this.state.country} />
 		</div>
 	);	
@@ -40,9 +25,8 @@ class App extends React.Component {
     
 function Heading() {
     return(
-	<div className='heading'>
+	    <div className='heading'>
 	    <h1>Weather</h1>
-	    <h3>Enter a city and country.</h3>
 	    </div>
     );
 }
@@ -56,6 +40,10 @@ class LocationForm extends React.Component {
 	this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    componentDidUpdate() {
+	this.callback = this.props.callback;
+    }
+
     handleChange(event) {
 	const target = event.target;
 	const name = target.name;
@@ -65,16 +53,13 @@ class LocationForm extends React.Component {
     }
 
     handleSubmit(event) {
-	console.log("In handleSubmit...");
-	console.log(this.state.city);
-	console.log(this.state.country);
 	this.callback(this.state.city, this.state.country);
 	event.preventDefault();
     }
 
     render() {
 	return(
-	    <div className='container'>
+	    <div className='input-container'>
 		<form onSubmit={this.handleSubmit}>
 		<label>
 		City:
@@ -94,6 +79,7 @@ class LocationForm extends React.Component {
 	    onChange={this.handleChange}
 		/>
 		</label>
+		<br />
 		<input type="submit" value="Submit" />
 		</form>
 		</div>
@@ -104,10 +90,26 @@ class LocationForm extends React.Component {
 class Weather extends React.Component {
     constructor(props) {
 	super(props);
-	this.state = {dataReceived: false};
-	this.temp = 0;
+	this.state = {data: null, error: false};
+	this._asyncRequest = null;
+	this.city = '';
+	this.country = '';
+    }
+	
+    componentDidUpdate() {
+	if(this.city != this.props.city || this.country != this.props.country) {
+	    this.city = this.props.city;
+	    this.country = this.props.country;
+	    this.getWeather(this.props.city, this.props.country);
+	}
     }
 
+    componentWillUnmount() {
+	if(this._asyncRequest) {
+	    this._asyncRequest.cancel();
+	}
+    }
+    
     getWeather(city, country) {
 	// Check if the city and country are null
 	if(city === '' || country === '') {
@@ -115,51 +117,118 @@ class Weather extends React.Component {
 	}
 	
 	else {
-	    var request = new XMLHttpRequest();
-	    request.open('GET', 'http://api.openweathermap.org/data/2.5/weather?q='
-			 + city + ',' + country + '&APPID=1691f032793d309e08203112cd0cd698', true);
-	    request.onload = () =>
-		{
-		    console.log("Request sent...");
-		    //  console.log(request.response);
-		    var data = JSON.parse(request.response);
-		    var temperature =  this.kelvinToCelsius(data['main']['temp']);
-		    this.setState({dataReceived: true});
-		    this.temp = temperature;
-		    // console.log(this.state.temp);
-		}
+	    this._asyncRequest = new Request('http://api.openweathermap.org/data/2.5/weather?q='
+					     + this.props.city + ',' + this.props.country + '&APPID=1691f032793d309e08203112cd0cd698');
 	    
-	    request.send();
+	    fetch(this._asyncRequest, {method: 'GET'})
+		.then(response => {
+		    if(!response.ok) {
+			throw "Response could not be processed";
+		    }
+		    return response.json();
+		})
+		.then(response => {
+		    this._asyncRequest = null;
+		    this.setState({data: response, error: false});
+		})
+		.catch(e => {
+		    console.log("Error in fetching data: " + e);
+		    this.setState({data: null, error: true});
+		})
 	}
     }
 
-    kelvinToCelsius(kelvins) {
-	return kelvins - 273.15;
+    render() {	
+	if(this.props.city === '' || this.props.country === ''){
+	    return null;
+	}
+
+	// If the city/country values have been changed since last render,
+	// fetch data for the new city, render Loading component.
+	else if(!this.state.data && !this.state.error) {    
+	    return (
+		<Loading />
+	    );
+	}
+
+	else if(this.state.error) {
+	    return (
+		    <Error />
+	    );
+	}
+	
+	// If we have received data, render
+	// the received weather info
+	else {
+	    return (
+		    <WeatherIcon data={this.state.data} />
+	    );
+	}
+	   
+    }
+}
+
+function Error(props) {
+    return(
+	    <div className='error'>
+	    <img src="Images/error.png" />
+	    <p>Something went wrong.</p>
+	    <p>Is there a spelling mistake?</p>
+	    </div>
+    );
+}
+
+function Loading(props) {
+    return(
+	    <div className='weather-container'>
+	    <div className='weather-icon'>
+	    <p>Weather is loading...</p>
+	    </div>
+	    </div>
+    );    
+}
+
+class WeatherIcon extends React.Component {
+    constructor(props) {
+	super(props);
+	if(props.data) {
+	this.resourcePath = 'http://openweathermap.org/img/wn/' +
+		props.data.weather[0].icon+'@2x.png';
+	}
+	else {
+	    this.resourcePath = '';
+	}
+    }
+
+    displayTempCelsius(kelvins) {
+	return Math.round(kelvins - 273.15);
+    }
+
+    capitalizeFirstChar(lower) {
+	const upper = lower.charAt(0).toUpperCase() + lower.substring(1);
+	return upper;
     }
     
     render() {
-	const city = this.props.city;
-	const country = this.props.country;
-	this.getWeather(city, country);
-	console.log("In Weather.render...");
-	console.log("city: " + city);
-	console.log("country: " + country);
-	if(city === '' || country === ''){
-	    return null;
+	const data = this.props.data;
+	if(data === null) {
+	    return (<Error />);
 	}
 	
-	else if(this.state.dataReceived) {
-	return (
-		<div>
-		<p>Temperature is {Math.round(this.temp)}.</p>
-		</div>
-	);
-	}
-
 	else {
-	    return (
-		    <div>
-		    <p>Temperature is loading...</p>
+	    const temp = this.displayTempCelsius(data['main']['temp']);
+	    const description = this.capitalizeFirstChar(data.weather[0].description);
+	    this.resourcePath = 'http://openweathermap.org/img/wn/' +
+		this.props.data.weather[0].icon+'@2x.png';
+	    return(
+		    <div className='weather-container'>
+		    <div className="weather-icon">
+		    <img src={this.resourcePath} alt={description} />
+		    </div>
+		    <div className='weather-icon-description'>
+		    <p>{description}</p>
+		    <p>{temp}&#8451;</p>
+		    </div>
 		    </div>
 	    );
 	}
