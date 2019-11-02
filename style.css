@@ -1,0 +1,74 @@
+body {
+    background-color: dark-gray;
+}
+
+h1 {
+    font-family: "Verdana", Geneva, sans-serif;
+    color: teal;
+    text-align: center;
+}
+
+h2 {
+    font-family: "Verdana", Geneva, sans-serif;
+    color: teal;
+    text-align: center;
+}
+
+p {
+    font-family: "Verdana", Geneva, sans-serif;
+    font-size: 100%;
+    color: orange;
+}
+
+.heading {
+    width: 50vw;
+    margin: 0 auto;
+}
+
+.input-container {
+    margin: 0 auto;
+    max-width: 10vw;
+    width: 10vw;
+}
+
+.input-container input {
+    box-sizing: border-box;
+    align: inline-block;
+    width: 100%
+}
+
+.input-container submit {
+    align: center;
+    width: 100%;
+}
+
+.weather-container {
+    border: .1vw solid black;
+    background-color: teal;
+    margin: 0 auto;
+    margin-top: 3vw;
+    margin-bottom: 3vw;
+    width: 10vw;
+    max-width: 10vw;
+    text-align: center;
+}
+
+.weather-icon{
+    padding: .1vw;
+    width: 100%;
+    align: inline-block;
+}
+
+.error {
+    padding: .5vw;
+    border: .1vw solid black;
+    background-color: teal;
+    margin: 0 auto;
+    margin-top: 3vw;
+    margin-bottom: 3vw;
+    width: 9.5vw;
+    max-width: 9.5vw;
+    text-align: center;
+}
+    
+
