@@ -97,6 +97,8 @@ class Weather extends React.Component {
     }
 	
     componentDidUpdate() {
+	// Check if the update has been caused by change to the country or city
+	// props. If so, adjust our temporary variables and fetch new data.
 	if(this.city != this.props.city || this.country != this.props.country) {
 	    this.city = this.props.city;
 	    this.country = this.props.country;
@@ -111,7 +113,6 @@ class Weather extends React.Component {
     }
     
     getWeather(city, country) {
-	// Check if the city and country are null
 	if(city === '' || country === '') {
 	    return;
 	}
@@ -143,8 +144,8 @@ class Weather extends React.Component {
 	    return null;
 	}
 
-	// If the city/country values have been changed since last render,
-	// fetch data for the new city, render Loading component.
+	// If the data is null and there have been no errors,
+	// render a loading state
 	else if(!this.state.data && !this.state.error) {    
 	    return (
 		<Loading />
@@ -157,8 +158,6 @@ class Weather extends React.Component {
 	    );
 	}
 	
-	// If we have received data, render
-	// the received weather info
 	else {
 	    return (
 		    <WeatherIcon data={this.state.data} />
@@ -166,26 +165,6 @@ class Weather extends React.Component {
 	}
 	   
     }
-}
-
-function Error(props) {
-    return(
-	    <div className='error'>
-	    <img src="Images/error.png" />
-	    <p>Something went wrong.</p>
-	    <p>Is there a spelling mistake?</p>
-	    </div>
-    );
-}
-
-function Loading(props) {
-    return(
-	    <div className='weather-container'>
-	    <div className='weather-icon'>
-	    <p>Weather is loading...</p>
-	    </div>
-	    </div>
-    );    
 }
 
 class WeatherIcon extends React.Component {
@@ -233,6 +212,26 @@ class WeatherIcon extends React.Component {
 	    );
 	}
     }
+}
+
+function Error(props) {
+    return(
+	    <div className='error'>
+	    <img src="Images/error.png" />
+	    <p>Something went wrong.</p>
+	    <p>Is there a spelling mistake?</p>
+	    </div>
+    );
+}
+
+function Loading(props) {
+    return(
+	    <div className='weather-container'>
+	    <div className='weather-icon'>
+	    <p>Weather is loading...</p>
+	    </div>
+	    </div>
+    );    
 }
 
 ReactDOM.render(
