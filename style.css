@@ -1,14 +1,4 @@
-body {
-    background-color: dark-gray;
-}
-
 h1 {
-    font-family: "Verdana", Geneva, sans-serif;
-    color: teal;
-    text-align: center;
-}
-
-h2 {
     font-family: "Verdana", Geneva, sans-serif;
     color: teal;
     text-align: center;
@@ -26,49 +16,98 @@ p {
 }
 
 .input-container {
-    margin: 0 auto;
-    max-width: 10vw;
-    width: 10vw;
-}
+	margin: 0 auto;
+	max-width: 10vw;
+	width: 10vw;
+	align: center;
+    }
 
-.input-container input {
-    box-sizing: border-box;
-    align: inline-block;
-    width: 100%
-}
+    .input-container input {
+	box-sizing: border-box;
+	align: inline-block;
+	width: 100%
+    }
 
-.input-container submit {
-    align: center;
-    width: 100%;
-}
+    .input-container submit {
+	align: center;
+	width: 100%;
+    }
 
-.weather-container {
-    border: .1vw solid black;
-    background-color: teal;
-    margin: 0 auto;
-    margin-top: 3vw;
-    margin-bottom: 3vw;
-    width: 10vw;
-    max-width: 10vw;
-    text-align: center;
-}
+    .weather-container {
+	padding: .5vw;
+	border: .1vw solid black;
+	background-color: teal;
+	margin: 0 auto;
+	margin-top: 3vw;
+	margin-bottom: 3vw;
+	width: 10vw;
+	max-width: 10vw;
+	text-align: center;
+    }
 
-.weather-icon{
-    padding: .1vw;
-    width: 100%;
-    align: inline-block;
-}
+    .weather-icon{
+	padding: .1vw;
+	width: 100%;
+	align: inline-block;
+    }
 
-.error {
-    padding: .5vw;
-    border: .1vw solid black;
-    background-color: teal;
-    margin: 0 auto;
-    margin-top: 3vw;
-    margin-bottom: 3vw;
-    width: 9.5vw;
-    max-width: 9.5vw;
-    text-align: center;
-}
-    
+    .error {
+	padding: .5vw;
+	border: .1vw solid black;
+	background-color: teal;
+	margin: 0 auto;
+	margin-top: 3vw;
+	margin-bottom: 3vw;
+	width: 10vw;
+	max-width: 10vw;
+	text-align: center;
+    }
 
+@media only screen and (max-width: 640px) {
+    .input-container {
+	margin: 0 auto;
+	max-width: 35vw;
+	width: 35vw;
+    }
+
+    .input-container input {
+	box-sizing: border-box;
+	align: inline-block;
+	width: 100%
+    }
+
+    .input-container submit {
+	align: center;
+	width: 100%;
+    }
+
+    .weather-container {   
+	padding: 1vw;
+	border: 1px solid black;
+	background-color: teal;
+	margin: 0 auto;
+	margin-top: 6vw;
+	margin-bottom: 6vw;
+	width: 35vw;
+	max-width: 35vw;
+	text-align: center;
+    }
+
+    .weather-icon{
+	padding: .1vw;
+	width: 100%;
+	align: inline-block;
+    }
+
+    .error {
+	padding: 1vw;
+	border: 1px solid black;
+	background-color: teal;
+	margin: 0 auto;
+	margin-top: 6vw;
+	margin-bottom: 6vw;
+	width: 35vw;
+	max-width: 35vw;
+	text-align: center;
+    }
+}

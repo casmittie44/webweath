@@ -22,7 +22,7 @@ class App extends React.Component {
 
     }
 }
-    
+
 function Heading() {
     return(
 	    <div className='heading'>
@@ -65,7 +65,7 @@ class LocationForm extends React.Component {
 		City:
 		<input
 	    name='city'
-	    type="text"
+	    type='text'
 	    value={this.state.city}
 	    onChange={this.handleChange} />
 		</label>
@@ -74,13 +74,13 @@ class LocationForm extends React.Component {
 		Country:
 		<input
 	    name='country'
-	    type="text"
+	    type='text'
 	    value={this.state.country}
 	    onChange={this.handleChange}
 		/>
 		</label>
 		<br />
-		<input type="submit" value="Submit" />
+		<input type='submit' value='Submit' />
 		</form>
 		</div>
 	);
@@ -92,13 +92,19 @@ class Weather extends React.Component {
 	super(props);
 	this.state = {data: null, error: false};
 	this._asyncRequest = null;
-	this.city = '';
+
+	// Store the previous state to determine
+	// if we need to re-fetch data
+	this.city = '';    
 	this.country = '';
     }
 	
     componentDidUpdate() {
 	// Check if the update has been caused by change to the country or city
 	// props. If so, adjust our temporary variables and fetch new data.
+	// This is not a perfect solution; it is possible that the user
+	// may want to resubmit even without changing the input; likely there are
+	// other edge cases where this is not quite the right behavior
 	if(this.city != this.props.city || this.country != this.props.country) {
 	    this.city = this.props.city;
 	    this.country = this.props.country;
@@ -124,8 +130,9 @@ class Weather extends React.Component {
 	    fetch(this._asyncRequest, {method: 'GET'})
 		.then(response => {
 		    if(!response.ok) {
-			throw "Response could not be processed";
+			throw "Request could not be processed";
 		    }
+		    
 		    return response.json();
 		})
 		.then(response => {
@@ -139,7 +146,8 @@ class Weather extends React.Component {
 	}
     }
 
-    render() {	
+    render() {
+	// No input submitted, do not render
 	if(this.props.city === '' || this.props.country === ''){
 	    return null;
 	}
@@ -196,6 +204,7 @@ class WeatherIcon extends React.Component {
 	
 	else {
 	    const temp = this.displayTempCelsius(data['main']['temp']);
+	    const cityName = this.capitalizeFirstChar(data.name);
 	    const description = this.capitalizeFirstChar(data.weather[0].description);
 	    this.resourcePath = 'http://openweathermap.org/img/wn/' +
 		this.props.data.weather[0].icon+'@2x.png';
@@ -205,6 +214,7 @@ class WeatherIcon extends React.Component {
 		    <img src={this.resourcePath} alt={description} />
 		    </div>
 		    <div className='weather-icon-description'>
+		    <p>{cityName}</p>
 		    <p>{description}</p>
 		    <p>{temp}&#8451;</p>
 		    </div>
